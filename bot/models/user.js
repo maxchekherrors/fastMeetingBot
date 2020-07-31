@@ -22,9 +22,19 @@ const userSchema = new mongoose.Schema({
     description:{
         type: String,
     },
+    photo:{
+      type:String,
+      default:''
+    },
     lastInvite:mongoose.Schema.ObjectId,
-    updatedAt: Date,
-    createdAt: Date
+    updatedAt: {
+        type:Date,
+        default:Date.now()
+    },
+    createdAt:  {
+        type:Date,
+        default:Date.now()
+    }
 });
 userSchema.virtual('fullName').get(function () {
     return this.firstName + ' ' + this.lastName;

@@ -1,4 +1,4 @@
-const{askLocation,gteLocation,getInviteDescription,getInvitePhoto,findFriends,dropInvite,submit,createInvite,getContact} =  require('../controlers/invite');
+const{askLocation,gteLocation,getInviteDescription,getInvitePhoto,findFriends,dropInvite,submit,createInvite} =  require('../controlers/invite');
 const Scene = require('telegraf/scenes/base');
 
 const inviteLocation = new Scene('inviteLocation');
@@ -9,7 +9,7 @@ inviteDescription.hears('Submit',submit);
 inviteDescription.enter(createInvite);
 inviteDescription.on('text',getInviteDescription);
 inviteDescription.on('photo', getInvitePhoto);
-inviteDescription.on('contact', getContact)
+//inviteDescription.on('contact', getContact)
 
 
 inviteAvailable.hears('Drop Invite', dropInvite);

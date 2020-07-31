@@ -38,23 +38,17 @@ exports.getInviteDescription = async ctx => {
     await Invite.updateOne({_id: user.lastInvite},{
         $set:{description: desc},
     });
-    await ctx.reply('Nice description, you can send photo or share your phone if you want.',
+    await ctx.reply('Nice description, you can send invite photo if you want. Or I will use your profile photo)',
         Extra.markup((markup) => {
             return markup.resize()
                 .keyboard([
-                    [markup.contactRequestButton('Send contact')],
+                   // [markup.contactRequestButton('Send contact')],
                     ['Submit']
                 ])
         }));
 
 };
-exports.getContact = async ctx=>{
-    const userId = ctx.message.from.id;
-    const phone = ctx.message.contact.phone_number;
-    await User.updateOne({_id:userId},{$set:{phoneNumber:phone}});
-    await ctx.reply('ouuuuu, all sexy chiks will call you!) bro');
 
-};
 exports.findFriends = async ctx => {
     const userId = ctx.message.from.id;
     await ctx.reply('Your invite is published, liveTime of invite 30 min, your can delete it prematurely',
