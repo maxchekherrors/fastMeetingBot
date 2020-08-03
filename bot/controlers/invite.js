@@ -77,7 +77,7 @@ exports.getInvitePhoto = async ctx => {
 
 };
 exports.findFriends = async ctx => {
-    const {inviteId} = ctx;
+    const {userId,inviteId} = ctx;
     await ctx.reply('Your invite is published, liveTime of invite 30 min, your can delete it prematurely',
         Extra.markup((markup) => {
             return markup.resize()
@@ -89,43 +89,27 @@ exports.findFriends = async ctx => {
     const friends = await invite.findAround();
     console.log(friends.length);
     friends.forEach(async friend => {
-        const distance = getDistance(invite.location, friend.location);
-        const friendInfo = await friend.getFullDescription();
-        const myInfo = await invite.getFullDescription();
-        /*await ctx.replyWithPhoto(friend.photo,
-            Extra.load({ caption: `📍${distance}\n ${friendInfo}` })
-                .markdown()
-                .markup((m) =>
-                    m.inlineKeyboard([
-                        m.callbackButton('❌', 'ignore'),
-                        m.callbackButton('❤️', friend._id)
-                    ])
-                )
-        );
-        await ctx.sendPhoto(friend.userId,invite.photo,
-            Extra.load({ caption: `📍${distance}\n ${myInfo}` })
-                .markdown()
-                .markup((m) =>
-                    m.inlineKeyboard([
-                        m.callbackButton('❌', 'ignore'),
-                        m.callbackButton('❤️', invite._id)
-                    ])
-                ));*/
-        await ctx.reply(`📍${distance}\n ${friendInfo}`,createInviteKeyboard(friend._id));
-        await ctx.sendMessage(friend.userId,`📍${distance}\n ${myInfo}`,createInviteKeyboard(invite._id));
+        const distance = Math.floor(getDistance(invite.location, friend.location));
+        await shareInvite(ctx.telegram,userId,friend,distance);
+        await shareInvite(ctx.telegram,friend.userId,invite,distance);
     })
 };
 
 
-function createInviteKeyboard(minviteId){
-    return Markup.inlineKeyboard([
-        Markup.callbackButton('❌', 'ignore'),
-        Markup.callbackButton('❤️', inviteId)
-    ]).extra()
+async function  shareInvite(telegram,userId,invite,dis){
+    const info = await invite.getFullDescription();
+    let photo = invite.photo;
+    if(photo.length === 0){
+        const user = await User.findOne({_id:invite.userId},'photo');
+        photo = user.photo;
+    }
+    return  telegram.sendPhoto(userId,photo,
+        Extra.load({ caption: `📍${dis}\n ${info}` })
+            .markdown()
+            .markup((m) =>
+                m.inlineKeyboard([
+                    m.callbackButton('❌', 'ignore'),
+                    m.callbackButton('❤️', invite._id)
+                ])
+            ));
 }
-/*
-function compilIvent(ivent){
-    ctx.replyWithPhoto(user.photo,
-        Extra.caption(`*${user.fullName}*\n_Age:_ *${user.age}*\n_About:_ *${user.description}*\n_Account status:_ *${user.phoneNumber ? 'verified' : 'unverified'}*`).markdown()
-    );
-}*/

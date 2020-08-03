@@ -55,8 +55,9 @@ inviteSchema.methods.findAround = function (dist = 4) {
     console.log('lat: from %d to %d lon from %d to %d',minLat,maxLat,minLong,maxLong);
     return mongoose.model('invite').find({
         $and: [
-           // {'available':true},
             {_id:{$ne:this._id}},
+            {'ready':true},
+            {'endDate':{$gte:Date.now()}},
             {'location.lat': {$gte:minLat }},
             {'location.lat': {$lte: maxLat}},
             {'location.lon': {$gte: minLong}},

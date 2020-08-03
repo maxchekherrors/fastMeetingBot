@@ -2,7 +2,7 @@ const User = require('./models/user');
 const Stage = require('telegraf/stage');
 
 const Scenes = require('./scenes');
-const stage = new Stage(Scenes, {ttl: 60 * 60 * 24 * 7});
+const stage = new Stage(Scenes, {default:'mainMenu'});
 const userValidation = async (ctx, next) => {
     const userId = ctx.message.from.id;
     if (ctx.message.text !== '/start')
