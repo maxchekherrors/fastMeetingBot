@@ -24,14 +24,14 @@ exports.menu = async ctx => {
         Extra.markup((markup) => {
             return markup.resize()
                 .keyboard([
-                    ['Edit profile'],
-                    ['Create invite']
+                    ['Create invite', 'Share phone'],
+                    ['Show profile', 'Edit profile']
                 ]).oneTime()
         }));
 };
 exports.getAge = async ctx => {
 
-    const userId = ctx.message.from.id;
+    const {userId} = ctx;
     const age = Number(ctx.message.text);
 
 
@@ -47,16 +47,16 @@ exports.getAge = async ctx => {
     }
 };
 exports.getProfilePhoto = async ctx => {
-    const userId = ctx.message.from.id;
+    const {userId} = ctx;
     const photo = ctx.message.photo[0].file_id;
-    await User.updateOne({_id: userId},{
-       $set:{photo:photo}
+    await User.updateOne({_id: userId}, {
+        $set: {photo: photo}
     });
     await ctx.reply('Ouu, have a nice dickkkk, respect!');
     await ctx.scene.enter('profileContact');
 };
 exports.getDescription = async ctx => {
-    const userId = ctx.message.from.id;
+    const {userId} = ctx;
     const desc = ctx.message.text;
     await User.updateOne({_id: userId}, {description: desc});
 
@@ -64,7 +64,7 @@ exports.getDescription = async ctx => {
     await ctx.scene.enter('profilePhoto');
 
 };
-exports.askContact = async ctx=>{
+exports.askContact = async ctx => {
     await ctx.reply('Give me your phone, I keep it save, i promise)',
         Extra.markup((markup) => {
             return markup.resize()
@@ -74,11 +74,19 @@ exports.askContact = async ctx=>{
                 ]).oneTime();
         }));
 };
-exports.getContact = async ctx=>{
-    const userId = ctx.message.from.id;
+exports.getContact = async ctx => {
+    const {userId} = ctx;
     const phone = ctx.message.contact.phone_number;
-    await User.updateOne({_id:userId},{$set:{phoneNumber:phone}});
+    await User.updateOne({_id: userId}, {$set: {phoneNumber: phone}});
     await ctx.reply('ouuuuu, all sexy chiks will call you!) bro')
     await ctx.scene.enter('mainMenu');
 
 };
+exports.showProfile = async ctx => {
+    const {userId} = ctx;
+    const user = await User.findOne({_id: userId});
+    ctx.replyWithPhoto(user.photo,
+        Extra.caption(`*${user.fullName}*\n_Age:_ *${user.age}*\n_About:_ *${user.description}*\n_Account status:_ *${user.phoneNumber ? 'verified' : 'unverified'}*`).markdown()
+    );
+};
+

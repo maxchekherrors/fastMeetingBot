@@ -2,7 +2,7 @@
 const session = require('telegraf/session');
 const Stage = require('telegraf/stage');*/
 const Scene = require('telegraf/scenes/base');
-const{getAge,getDescription,createOrUpdate,menu,getProfilePhoto,getContact,askContact} = require('../controlers/user');
+const{getAge,getDescription,createOrUpdate,menu,getProfilePhoto,getContact,askContact,showProfile} = require('../controlers/user');
 
 const profileAge = new Scene('profileAge');
 const profileDescription = new Scene('profileDescription');
@@ -33,8 +33,8 @@ profileUpdate.enter(createOrUpdate);
 
 mainMenu.hears('Edit profile',async ctx=>await ctx.scene.enter('profileUpdate'));
 mainMenu.hears('Create invite',async ctx=>await ctx.scene.enter('inviteDescription'));
-mainMenu.hears('Share phone',async ctx=>await ctx.scene.enter('inviteDescription'));
-mainMenu.hears('Show profile',async ctx=>await ctx.scene.enter('inviteDescription'));
+mainMenu.hears('Share phone',async ctx=>await ctx.scene.enter('profileContact'));
+mainMenu.hears('Show profile',showProfile);
 
 profileAge.on('text',getAge);
 

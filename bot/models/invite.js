@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const User = require('./user');
 const inviteSchema = new mongoose.Schema({
     userId: {
         type: Number,
@@ -13,7 +14,7 @@ const inviteSchema = new mongoose.Schema({
             type: Number,
             default:0
         },
-        long: {
+        lon: {
             type: Number,
             default:0
         }
@@ -41,16 +42,26 @@ const inviteSchema = new mongoose.Schema({
 inviteSchema.virtual('available').get(function () {
     return this.ready && (Date.now() < this.endDate);
 });
+
+inviteSchema.methods.getFullDescription = async function(){
+    const user = await User.findOne({_id:this.userId});
+    return `${user.fullName}, ${user.age} - ${user.description}\n🎯 ${this.description}`;
+};
 inviteSchema.methods.findAround = function (dist = 4) {
+    const minLat = this.location.lat - (dist / 111.0);
+    const maxLat = this.location.lat + (dist / 111.0);
+    const minLong = this.location.lon - dist / Math.abs(Math.cos(Math.PI / 180 * this.location.lat) * 111.0);
+    const maxLong = this.location.lon + dist / Math.abs(Math.cos(Math.PI / 180 * this.location.lat) * 111.0);
+    console.log('lat: from %d to %d lon from %d to %d',minLat,maxLat,minLong,maxLong);
     return mongoose.model('invite').find({
         $and: [
-            {'location.lat': {$gte: this.location.lat - (dist / 111.0)}},
-            {'location.lat': {$lte: this.location.lat + (dist / 111.0)}},
-            {'location.long': {$gte: this.location.long + dist / Math.abs(Math.cos(Math.PI / 180 * this.location.lat) * 111.0)}},
-            {'location.long': {$lte: this.location.long - dist / Math.abs(Math.cos(Math.PI / 180 * this.location.lat) * 111.0)}}
-
+           // {'available':true},
+            {_id:{$ne:this._id}},
+            {'location.lat': {$gte:minLat }},
+            {'location.lat': {$lte: maxLat}},
+            {'location.lon': {$gte: minLong}},
+            {'location.lon': {$lte: maxLong}}
         ]
-
     })
 };
 const Invite = mongoose.model("invite", inviteSchema);

@@ -1,10 +1,10 @@
 const mongoose = require('mongoose');
-const Invite = require('./invite');
+
 const userSchema = new mongoose.Schema({
     _id: Number,
     phoneNumber:{
         type: String,
-        unique:true
+        default: ""
     },
     age:Number,
     userName: {
