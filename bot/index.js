@@ -4,8 +4,8 @@ const Stage = require('telegraf/stage');
 const Scenes = require('./scenes');
 const stage = new Stage(Scenes, {default:'mainMenu'});
 const userValidation = async (ctx, next) => {
-    const userId = ctx.message.from.id;
-    if (ctx.message.text !== '/start')
+    const userId = ctx.from.id;
+    if (!ctx.message||ctx.message.text !== '/start')
         if (!await User.exists({_id: userId}))
             return ctx.reply('Go /start vasilii');
         else {

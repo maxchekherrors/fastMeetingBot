@@ -11,9 +11,7 @@ bot.use(Telegraf.log());
 bot.use(session());
 
 applyBotMidelwayers(bot);
-bot.start(async ctx=>{
-   await ctx.scene.enter('profileUpdate');
-});
+
 bot.help(async ctx=>{
     await ctx.reply('interesting information');
 });

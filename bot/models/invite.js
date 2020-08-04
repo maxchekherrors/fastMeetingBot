@@ -45,14 +45,13 @@ inviteSchema.virtual('available').get(function () {
 
 inviteSchema.methods.getFullDescription = async function(){
     const user = await User.findOne({_id:this.userId});
-    return `${user.fullName}, ${user.age} - ${user.description}\n🎯 ${this.description}`;
+    return `Verified:${user.phoneNumber===''? '❌ ':'✅'} \n${user.fullName}, ${user.age} - ${user.description}\n🎯 ${this.description}`;
 };
 inviteSchema.methods.findAround = function (dist = 4) {
     const minLat = this.location.lat - (dist / 111.0);
     const maxLat = this.location.lat + (dist / 111.0);
     const minLong = this.location.lon - dist / Math.abs(Math.cos(Math.PI / 180 * this.location.lat) * 111.0);
     const maxLong = this.location.lon + dist / Math.abs(Math.cos(Math.PI / 180 * this.location.lat) * 111.0);
-    console.log('lat: from %d to %d lon from %d to %d',minLat,maxLat,minLong,maxLong);
     return mongoose.model('invite').find({
         $and: [
             {_id:{$ne:this._id}},
