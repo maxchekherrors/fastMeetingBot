@@ -1,2 +1,2 @@
 const Distance = require('geo-distance');
-module.exports = Distance.between;
+module.exports = (from,to)=>Distance.between(from,to).human_readable();

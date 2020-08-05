@@ -4,7 +4,7 @@ const Markup = require('telegraf/markup');
 const Extra = require('telegraf/extra');
 const getDistance = require('../../utils/getDistance');
 
-exports.askLocation =  ctx => {
+exports.askLocation = ctx => {
     return ctx.reply('Ok, now, send me your location and I find friends for you.', Extra.markup((markup) => {
         return markup.resize()
             .keyboard([
@@ -12,7 +12,7 @@ exports.askLocation =  ctx => {
             ]).oneTime();
     }));
 };
-exports.submit =  ctx => ctx.scene.enter('inviteLocation');
+exports.submit = ctx => ctx.scene.enter('inviteLocation');
 exports.gteLocation = async ctx => {
     const {inviteId} = ctx;
     const {latitude, longitude} = ctx.message.location;
@@ -81,19 +81,38 @@ exports.findFriends = async ctx => {
         return ctx.reply('I did not find invitations nearby. Just wait.');
     else
         friends.forEach(async friend => {
-            const distance = Math.floor(getDistance(invite.location, friend.location));
+            const distance = getDistance(invite.location, friend.location);
             await shareInvite(ctx.telegram, userId, friend, distance);
             await shareInvite(ctx.telegram, friend.userId, invite, distance);
         })
 };
 
-exports.likeInvite = async ctx=>{
-      const{inviteId} = ctx;
-      const likedId = ctx.callbackQuery.data;
-      Invite.updateOne({_id:likedId},{
-          $push:{ agreedInvitations:inviteId}
-      });
+exports.agreeInvite = async ctx => {
+    const {inviteId,userId} = ctx;
+    const agreedId = ctx.callbackQuery.data;
+    await Invite.updateOne({_id: agreedId}, {
+        $push: {agreedInvitations: inviteId}
+    });
+    const userInvite = await Invite.findOne({$and: [{_id: inviteId}, {agreedInvitations: agreedId}]});
+    if (userInvite) {
+        const agreedInvite = await Invite.findOne({_id: agreedId},'userId');
+        await shareInfo(ctx.telegram,userId,agreedInvite.userId);
+        await shareInfo(ctx.telegram,agreedInvite.userId,userId);
+        // await ctx.reply('@' + user.userName + ', agreed your invite!');
+        // await ctx.telegram.sendMessage(liked.userId, '@' + ctx.from.username + ', agreed your invite!');
+
+    }
+    return ctx.deleteMessage();
 };
+
+async function shareInfo(telegram, userId, profileId) {
+    const user = await User.findOne({_id: profileId});
+    const photo = user.photo;
+    if (user)
+    return telegram.sendPhoto(userId, photo,
+        Extra.load({caption: `${user.firstName},${user.age} - ${user.description}\n@${user.userName}\n*Agreed in your invite!*`})
+            .markdown());
+}
 
 async function shareInvite(telegram, userId, invite, dis) {
     const info = await invite.getFullDescription();

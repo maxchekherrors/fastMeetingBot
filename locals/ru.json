@@ -1,0 +1,80 @@
+{
+  "menu": {
+    "text": {
+      "enter": ""
+    },
+    "buttons":{
+      "setContact": "",
+      "editProfile": "",
+      "createInvite": "",
+      "showProfile": ""
+
+    }
+  },
+  "Profile": {
+    "age": {
+      "text": {
+        "enter": "",
+        "error": "",
+        "success": ""
+      }
+    },
+    "description": {
+      "text": {
+        "enter": "",
+        "error": "",
+        "success": ""
+      }
+    },
+    "photo": {
+      "text": {
+        "enter": "",
+        "error": "",
+        "success": ""
+      }
+    },
+    "contact": {
+      "text": {
+        "enter": "",
+        "error": "",
+        "success": ""
+      },
+      "buttons":{
+        "send": "",
+        "refuse": ""
+      }
+    }
+  },
+  "invite": {
+    "description": {
+      "text": {
+        "enter": "",
+        "error": "",
+        "success": ""
+      },
+      "buttons":{
+        "submit": ""
+      }
+    },
+    "location": {
+      "text": {
+        "enter": "",
+        "error": "",
+        "success": ""
+      },
+      "buttons":{
+        "sendLocation": ""
+      }
+    },
+    "available":{
+      "text": {
+        "enter": "",
+        "noResults": ""
+      },
+      "buttons":{
+        "drop": ""
+      }
+    }
+
+  }
+}

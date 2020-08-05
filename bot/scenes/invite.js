@@ -1,4 +1,4 @@
-const{askLocation,gteLocation,getInviteDescription,getInvitePhoto,findFriends,dropInvite,submit,createInvite} =  require('../controlers/invite');
+const{askLocation,gteLocation,getInviteDescription,getInvitePhoto,findFriends,dropInvite,submit,createInvite,agreeInvite} =  require('../controlers/invite');
 const Scene = require('telegraf/scenes/base');
 
 const inviteLocation = new Scene('inviteLocation');
@@ -19,10 +19,7 @@ inviteDescription.on('message', ctx=>ctx.reply('Send me your location, fagot!'))
 inviteAvailable.hears('Drop Invite', dropInvite);
 inviteAvailable.enter(findFriends);
 inviteAvailable.action('ignore',ctx=>ctx.deleteMessage());
-inviteAvailable.on('callback_query',ctx=>{
-
-
-});
+inviteAvailable.on('callback_query',agreeInvite);
 inviteAvailable.on('message', ctx=>ctx.reply('Yuo can drop invite, if you want go back to menu'));
 
 
