@@ -1,4 +1,4 @@
-const User = require('../bot/models/user');
+const User = require('../bot/user/user.model');
 module.exports = async (ctx, next) => {
     const userId = ctx.from.id;
     const username = ctx.from.username;
