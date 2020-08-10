@@ -2,36 +2,39 @@
 const session = require('telegraf/session');
 const Stage = require('telegraf/stage'); */
 const Scene = require('telegraf/scenes/base');
+const simpleAnswer = require('../../utils/createMsgAnsw');
 const {
-	getAge, getDescription, createOrUpdate, menu, getProfilePhoto, getContact, askContact, showProfile,
-} = require('./user.controler');
+	getAge, getDescription,
+	createOrUpdate, menu,
+	getProfilePhoto, getContact,
+	askContact, showProfile,} = require('./user.controler');
 
-const profileAge = new Scene('profileAge');
-const profileDescription = new Scene('profileDescription');
+
 const profileUpdate = new Scene('profileUpdate');
-const mainMenu = new Scene('mainMenu');
-const profilePhoto = new Scene('profilePhoto');
-const profileContact = new Scene('profileContact');
-
 profileUpdate.enter(createOrUpdate);
 
+const profileAge = new Scene('profileAge');
 profileAge.enter((ctx) => ctx.reply('How old are you ?'));
 profileAge.on('text', getAge);
-profileAge.on('message', (ctx) => ctx.reply('Dont play with me!'));
+profileAge.on('message', simpleAnswer('Dont play with me!'));
 
-profileDescription.enter((ctx) => ctx.reply('Tell me about you:'));
+const profileDescription = new Scene('profileDescription');
+profileDescription.enter(simpleAnswer('Tell me about you:'));
 profileDescription.on('text', getDescription);
-profileDescription.on('message', (ctx) => ctx.reply('It must be a little text description'));
+profileDescription.on('message', simpleAnswer('It must be a little text description'));
 
-profilePhoto.enter((ctx) => ctx.reply('Show me your fucking face, dear)'));
+const profilePhoto = new Scene('profilePhoto');
+profilePhoto.enter( simpleAnswer('Show me your fucking face, dear)'));
 profilePhoto.on('photo', getProfilePhoto);
-profilePhoto.on('message', (ctx) => ctx.reply('Is not your face!!!!'));
+profilePhoto.on('message', simpleAnswer('Is not your face!!!!'));
 
+const profileContact = new Scene('profileContact');
 profileContact.enter(askContact);
-profileContact.on('contact', getContact);
 profileContact.hears('NO', (ctx) => ctx.scene.enter('mainMenu'));
-profileContact.on('message', (ctx) => ctx.reply('Just choose between yes and no'));
+profileContact.on('contact', getContact);
+profileContact.on('message', simpleAnswer('Just choose between yes and no'));
 
+const mainMenu = new Scene('mainMenu');
 mainMenu.enter(menu);
 mainMenu.start(async (ctx) => await ctx.scene.enter('profileUpdate'));
 mainMenu.hears('Edit profile', (ctx) => ctx.scene.enter('profileUpdate'));
@@ -40,9 +43,11 @@ mainMenu.hears('Share phone', (ctx) => ctx.scene.enter('profileContact'));
 mainMenu.hears('Show profile', showProfile);
 mainMenu.on('message', (ctx) => ctx.scene.enter('mainMenu'));
 
-exports.profileUpdate = profileUpdate;
-exports.profileAge = profileAge;
-exports.profileDescription = profileDescription;
-exports.profilePhoto = profilePhoto;
-exports.profileContact = profileContact;
-exports.mainMenu = mainMenu;
+module.exports = {
+	profileUpdate,
+	profileAge,
+	profileDescription,
+	profilePhoto,
+	profileContact,
+	mainMenu
+};
