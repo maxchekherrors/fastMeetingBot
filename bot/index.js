@@ -9,7 +9,7 @@ fs.readdirSync(__dirname)
 		(file) => {
 			const scenes = require(path.join(__dirname, file));
 			for (const key in scenes) {
-				Scenes.push(scenes[key]);
+				Scenes.push(scenes[key]());
 			}
 		},
 	);

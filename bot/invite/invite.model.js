@@ -52,6 +52,7 @@ inviteSchema.methods.findAround = function (dist = 150) {
 	const maxLat = this.location.lat + (dist / 111.0);
 	const minLong = this.location.lon - dist / Math.abs(Math.cos(Math.PI / 180 * this.location.lat) * 111.0);
 	const maxLong = this.location.lon + dist / Math.abs(Math.cos(Math.PI / 180 * this.location.lat) * 111.0);
+	console.log(minLat,maxLat,minLong,maxLong);
 	return mongoose.model('invite').find({
 		$and: [
 			{_id: {$ne: this._id}},
