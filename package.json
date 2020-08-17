@@ -6,6 +6,8 @@
   "dependencies": {
     "dotenv": "^8.2.0",
     "geo-distance": "^0.2.0",
+    "koa": "^2.13.0",
+    "koa-body": "^4.2.0",
     "mongoose": "^5.9.26",
     "telegraf": "^3.38.0"
   },

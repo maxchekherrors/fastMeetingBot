@@ -1,4 +1,4 @@
-const User = require('../bot/user/user.model');
+const User = require('../botApi/user/user.model');
 module.exports = async (ctx, next) => {
 	const userId = ctx.from.id;
 	if (!ctx.message||ctx.message.text !== '/start'){
