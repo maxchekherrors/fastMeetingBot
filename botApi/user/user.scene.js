@@ -1,80 +1,67 @@
 
 const Scene = require('telegraf/scenes/base');
-const simpleAnswer = require('../../utils/createMsgAnsw');
+//const simpleAnswer = require('../../utils/createMsgAnsw');
 const conf = require('../../locals/ru').profile;
-const {
-	getAge, getDescription,
-	createOrUpdate, menu,
-	getProfilePhoto, getContact,
-	askContact, showProfile,
-	getProfileSex,askProfileSex
-} = require('./user.controler');
+const controllers = require('./user.controller');
+const {next} = controllers;
+
 
 exports.profileUpdate = () => {
+    const {profileUpdate} = controllers;
 	const update = new Scene('profileUpdate');
-	update.enter(createOrUpdate);
+    update.hears(`${conf.create.buttons.submit}`,next);
+	update.enter(profileUpdate.do);
 	return update;
 };
 
 exports.profileAge = () => {
+    const {profileAge} = controllers;
 	const age = new Scene('profileAge');
-	age.enter(simpleAnswer(`${conf.age.text.enter}`));
-	age.on('text', getAge);
-	age.on('message', simpleAnswer(`${conf.age.text.error}`));
+	age.enter(profileAge.ask);
+	age.hears(`${conf.age.buttons.submit}`,next);
+	age.on('text', profileAge.get);
+	age.on('message', profileAge.error);
 	return age;
 };
 exports.profileDescription = () => {
+    const {profileDescription} = controllers;
 	const description = new Scene('profileDescription');
-	description.enter(simpleAnswer(`${conf.description.text.enter}`));
-	description.hears(`${conf.description.buttons.submit}`,ctx=>ctx.scene.enter('profilePhoto'));
-	description.on('text', getDescription);
-
-	description.on('message', simpleAnswer(`${conf.description.text.error}`));
+	description.enter(profileDescription.ask);
+    description.hears(`${conf.description.buttons.submit}`,next);
+	description.on('text', profileDescription.get);
+	description.on('message', profileDescription.error);
 	return description;
 };
 exports.profilePhoto = () => {
+    const {profilePhoto} = controllers;
 	const photo = new Scene('profilePhoto');
-	photo.enter(simpleAnswer(`${conf.photo.text.enter}`));
-	photo.on('photo', getProfilePhoto);
-	photo.on('message', simpleAnswer(`${conf.photo.text.error}`));
+	photo.enter(profilePhoto.ask);
+    photo.hears(`${conf.photo.buttons.submit}`,next);
+	photo.on('photo', profilePhoto.get);
+	photo.on('message', profilePhoto.error);
 	return photo;
 };
 
 
 exports.profileContact = () => {
+    const {profileContact} = controllers;
 	const contact = new Scene('profileContact');
-	contact.enter(askContact);
-	contact.hears(`${conf.contact.buttons.refuse}`, (ctx) => ctx.scene.enter('mainMenu'));
-	contact.on('contact', getContact);
-	contact.on('message', simpleAnswer(`${conf.contact.text.error}`));
+	contact.enter(profileContact.ask);
+	contact.hears(`${conf.contact.buttons.refuse}`, next);
+	contact.on('contact', profileContact.get);
+	contact.on('message', profileContact.error);
 	return contact;
 };
 
 
-exports.mainMenu = () => {
-	const mainMenu = new Scene('mainMenu');
-	mainMenu.enter(menu);
-	mainMenu.start( (ctx) =>  ctx.scene.enter('profileUpdate'));
-	mainMenu.hears(`${conf.menu.buttons.editProfile}`, async (ctx) => {
 
-		return ctx.scene.enter('profileUpdate');
-	});
-	mainMenu.hears(`${conf.menu.buttons.createInvite}`, async (ctx) => {
-		return ctx.scene.enter('inviteDescription');
-	});
-	mainMenu.hears(`${conf.menu.buttons.setContact}`, async (ctx) => {
-
-		return ctx.scene.enter('profileContact');
-	});
-	mainMenu.hears(`${conf.menu.buttons.showProfile}`, showProfile);
-	mainMenu.on('message', (ctx) => ctx.scene.enter('mainMenu'));
-	return mainMenu;
-};
 exports.profileSex = ()=>{
+    const {profileSex} = controllers;
 	const sex = new Scene('profileSex');
-	sex.enter(askProfileSex);
-	sex.on('text',getProfileSex);
-	sex.on('message',simpleAnswer(conf.sex.text.error));
+	sex.enter(profileSex.ask);
+    sex.hears(`${conf.sex.buttons.submit}`,next);
+	sex.on('text',profileSex.get);
+	sex.on('message',profileSex.error);
 	return sex;
 };
 

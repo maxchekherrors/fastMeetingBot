@@ -20,7 +20,7 @@ app.use(async (ctx) => {
 
 async function bootstrap() {
 	await mongoose.connect(`${process.env.DATABASE_CONNECTION}`, {useNewUrlParser: true});
-	await bot.telegram.setWebhook(`${process.env.WEB_HOOK}`);
+	await bot.launch()//bot.telegram.setWebhook(`${process.env.WEB_HOOK}`);
 	return app.listen(`${process.env.PORT}`);
 }
 
