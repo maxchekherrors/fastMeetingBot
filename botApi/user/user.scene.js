@@ -7,15 +7,15 @@ const {next} = controllers;
 
 
 exports.profileUpdate = () => {
-    const {profileUpdate} = controllers;
+	const {profileUpdate} = controllers;
 	const update = new Scene('profileUpdate');
-    update.hears(`${conf.create.buttons.submit}`,next);
+	update.hears(`${conf.create.buttons.submit}`,next);
 	update.enter(profileUpdate.do);
 	return update;
 };
 
 exports.profileAge = () => {
-    const {profileAge} = controllers;
+	const {profileAge} = controllers;
 	const age = new Scene('profileAge');
 	age.enter(profileAge.ask);
 	age.hears(`${conf.age.buttons.submit}`,next);
@@ -24,19 +24,19 @@ exports.profileAge = () => {
 	return age;
 };
 exports.profileDescription = () => {
-    const {profileDescription} = controllers;
+	const {profileDescription} = controllers;
 	const description = new Scene('profileDescription');
 	description.enter(profileDescription.ask);
-    description.hears(`${conf.description.buttons.submit}`,next);
+	description.hears(`${conf.description.buttons.submit}`,next);
 	description.on('text', profileDescription.get);
 	description.on('message', profileDescription.error);
 	return description;
 };
 exports.profilePhoto = () => {
-    const {profilePhoto} = controllers;
+	const {profilePhoto} = controllers;
 	const photo = new Scene('profilePhoto');
 	photo.enter(profilePhoto.ask);
-    photo.hears(`${conf.photo.buttons.submit}`,next);
+	photo.hears(`${conf.photo.buttons.submit}`,next);
 	photo.on('photo', profilePhoto.get);
 	photo.on('message', profilePhoto.error);
 	return photo;
@@ -44,10 +44,10 @@ exports.profilePhoto = () => {
 
 
 exports.profileContact = () => {
-    const {profileContact} = controllers;
+	const {profileContact} = controllers;
 	const contact = new Scene('profileContact');
 	contact.enter(profileContact.ask);
-	contact.hears(`${conf.contact.buttons.refuse}`, next);
+	contact.hears(`${conf.contact.buttons.refuse}`, profileContact.skip);
 	contact.on('contact', profileContact.get);
 	contact.on('message', profileContact.error);
 	return contact;
@@ -56,12 +56,20 @@ exports.profileContact = () => {
 
 
 exports.profileSex = ()=>{
-    const {profileSex} = controllers;
+	const {profileSex} = controllers;
 	const sex = new Scene('profileSex');
 	sex.enter(profileSex.ask);
-    sex.hears(`${conf.sex.buttons.submit}`,next);
+	sex.hears(`${conf.sex.buttons.submit}`,next);
 	sex.on('text',profileSex.get);
 	sex.on('message',profileSex.error);
 	return sex;
+};
+exports.profileEdit = ()=>{
+	const {profileEdit} = controllers;
+	const edit = new Scene('profileEdit');
+	edit.enter(profileEdit.ask);
+	edit.on('text',profileEdit.get);
+	edit.on('message',profileEdit.error);
+	return edit;
 };
 

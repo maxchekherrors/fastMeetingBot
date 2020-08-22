@@ -1,9 +1,26 @@
 const Extra = require('telegraf/extra');
 const conf = require('../../locals/ru').profile;
 const User = require('./user.model');
+function formateDescription(text){
+   const {length} = text;
+   const nextl = text.match(/\n/g);
+   const lines = nextl? nextl.length:0;
+   let isOk = true;
+    if (length > 300) {
+        text = text.slice(0, 300);
+        text += '...';
+        isOk = false;
+    }
+    if(lines>length/30){
+        text = text.replace(/\n/g,' ');
+        isOk = false;
+    }
 
+    return isOk;
+}
 exports.profileSex = {
     ask: ctx => {
+
         return ctx.replyWithHTML(`${conf.sex.text.enter}`, Extra.markup(m => m
             .resize()
             .keyboard([
@@ -32,14 +49,8 @@ exports.profileSex = {
         await User.updateOne({_id: userId}, {
             $set: {sex: userSex}
         });
-        ctx.sceneComplete();
-        return ctx.replyWithHTML(`${answ}`, Extra.markup(m => m
-                .resize()
-                .keyboard([
-                    `${conf.sex.buttons.submit}`
-                ])
-            )
-        );
+
+        return ctx.sceneComplete(`${answ}`, `${conf.sex.buttons.submit}`);
 
     },
     error: ctx => ctx
@@ -57,13 +68,7 @@ exports.profilePhoto = {
         await User.updateOne({_id: userId}, {
             $set: {photo},
         });
-        ctx.sceneComplete();
-        return ctx.replyWithHTML(`${conf.photo.text.success}`, Extra.markup(m => m
-            .resize()
-            .keyboard([
-                `${conf.photo.buttons.submit}`
-            ])));
-
+        return ctx.sceneComplete(`${conf.photo.text.success}`, `${conf.photo.buttons.submit}`);
     },
     error: ctx => ctx
         .replyWithHTML(`${conf.sex.text.error}`, Extra.markup(m => m.removeKeyboard()))
@@ -78,13 +83,7 @@ exports.profileAge = {
             return ctx.replyWithHTML(`${conf.age.text.notInRange}`);
         }
         await User.updateOne({_id: userId}, {age});
-        ctx.sceneComplete();
-        return ctx.replyWithHTML(`${conf.age.text.success}`, Extra.markup(m => m
-            .resize()
-            .keyboard([
-                `${conf.age.buttons.submit}`
-            ])));
-
+        return ctx.sceneComplete(`${conf.age.text.success}`, `${conf.age.buttons.submit}`);
     },
 
     error: ctx => ctx
@@ -92,7 +91,6 @@ exports.profileAge = {
 };
 exports.profileContact = {
     ask: async (ctx) => {
-        ctx.sceneComplete();
         return ctx.replyWithHTML(`${conf.contact.text.enter}`,
             Extra.markup((markup) => markup.resize()
                 .keyboard([
@@ -100,11 +98,12 @@ exports.profileContact = {
                     [`${conf.contact.buttons.refuse}`],
                 ]).oneTime()));
     },
+    skip: ctx => ctx.nextScene(true),
     get: async (ctx) => {
         const {userId} = ctx;
         const phone = ctx.message.contact.phone_number;
         await User.updateOne({_id: userId}, {$set: {phoneNumber: phone}});
-        return ctx.nextScene();
+        return ctx.nextScene(true);
     },
     error: ctx => ctx
         .replyWithHTML(`${conf.contact.text.error}`)
@@ -118,24 +117,19 @@ exports.profileDescription = {
         const {userId} = ctx;
         let answ = conf.description.text.success;
         let desc = ctx.message.text;
-        if (desc.length > 300) {
-            desc = desc.slice(0, 300);
-            desc += '...';
+
+        if (!formateDescription(desc))
             answ = conf.description.text.toLarge;
-        }
+
         await User.updateOne({_id: userId}, {description: desc});
-        ctx.sceneComplete();
-        return ctx.replyWithHTML(`${answ}`, Extra.markup(m => m
-            .resize()
-            .keyboard([
-                `${conf.description.buttons.submit}`
-            ])));
+        return ctx.sceneComplete(`${answ}`, `${conf.description.buttons.submit}`);
     },
     error: ctx => ctx
         .replyWithHTML(`${conf.description.text.error}`)
 };
 exports.profileUpdate = {
     do: async (ctx) => {
+        console.log('dfsdf');
         const {from} = ctx.message;
         let answ = '';
         const user = {
@@ -146,21 +140,50 @@ exports.profileUpdate = {
         };
         if (!await User.exists({_id: from.id})) {
             await new User(user).save();
-            answ = conf.create.text.enter
+            answ = conf.create.text.enter;
         } else {
             await User.updateOne({_id: from.id}, {user});
             answ = conf.create.text.reenter;
         }
-        ctx.sceneComplete();
-        return await ctx.replyWithHTML(`${answ}`, Extra.markup(m => m
-            .resize()
-            .keyboard([
-                `${conf.create.buttons.submit}`
-            ])
-        ));
+        await ctx.replyWithHTML('...');
+        return ctx.sceneComplete(`${answ}`, `${conf.create.buttons.submit}`);
+
     }
 };
-exports.next = ctx=>ctx.nextScene();
+exports.profileEdit = {
+    ask: ctx => {
+        const {contact, description, sex, age, photo} = conf.edit.buttons;
+        const{enter} = conf.edit.text;
+        const kb = [
+            [contact],
+            [description, photo],
+            [age, sex]
+        ];
+        ctx.sceneComplete(`${enter}`,kb);
+    },
+    get: ctx=>{
+        const {contact, description, sex, age, photo} = conf.edit.buttons;
+        const{error} = conf.edit.text;
+        const mes = ctx.message.text;
+        switch (mes) {
+            case contact:
+                return ctx.scene.enter('profileContact');
+            case description:
+                return ctx.scene.enter('profileDescription');
+            case sex:
+                return ctx.scene.enter('profileSex');
+            case age:
+                return ctx.scene.enter('profileAge');
+            case photo:
+                return ctx.scene.enter('profilePhoto');
+            default:
+                return ctx.replyWithHTML(`${error}`);
+        }
+    },
+    error:ctx=> ctx.replyWithHTML(`${error}`)
+
+};
+exports.next = ctx => ctx.nextScene();
 
 
 

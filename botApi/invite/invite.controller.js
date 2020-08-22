@@ -25,13 +25,13 @@ exports.inviteLocation = {
 			$set: {location: {lat: latitude, lon: longitude}},
 			ready: true,
 		});
-		ctx.sceneComplete();
-		return ctx.nextScene()//return ctx.scene.enter('inviteAvailable');
+
+		return ctx.nextScene(true);//return ctx.scene.enter('inviteAvailable');
 	},
 	undo:async ctx => {
 		const {inviteId} = ctx;
 		await Invite.deleteOne({_id: inviteId});
-		return ctx.scene.enter('mainMenu');
+		return ctx.dropScenario();
 	},
 	error:ctx=>ctx.replyWithHTML(`${conf.location.text.error}`)
 };
@@ -53,15 +53,8 @@ exports.inviteDescription = {
 		await Invite.updateOne({_id: inviteId}, {
 			$set: {description: desc},
 		});
-		ctx.sceneComplete()
-		return ctx.replyWithHTML(`${conf.description.text.preSuccess}`,
-			Extra.markup(m => m
-				.keyboard([
-					[`${conf.description.buttons.submit}`],
-				])
-				.resize()
-				.oneTime()
-			));
+
+		return ctx.sceneComplete(`${conf.description.text.preSuccess}`,`${conf.description.buttons.submit}`);
 	},
 	getPhoto:async (ctx) => {
 		const {inviteId} = ctx;
@@ -112,7 +105,7 @@ exports.inviteAvailable = {
 		await Invite.updateOne({_id: inviteId}, {
 			endDate: Date.now(),
 		});
-		return ctx.scene.enter('mainMenu');
+		return ctx.dropScenario();
 	},
 	error:ctx=>ctx.replyWithHTML(`${conf.available.text.error}`)
 };

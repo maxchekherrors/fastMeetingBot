@@ -47,7 +47,8 @@ inviteSchema.methods.getFullDescription = async function () {
 	const user = await User.findOne({_id: this.userId});
 	return `Verified:${user.phoneNumber === '' ? '❌ ' : '✅'} \n${user.fullName}, ${user.age} - ${user.description}\n🎯 ${this.description}`;
 };
-inviteSchema.methods.findAround = function (dist = 150) {
+inviteSchema.methods.findAround = function () {
+	const dist = process.env.SEARCH_RADIUS||5;
 	const minLat = this.location.lat - (dist / 111.0);
 	const maxLat = this.location.lat + (dist / 111.0);
 	const minLong = this.location.lon - dist / Math.abs(Math.cos(Math.PI / 180 * this.location.lat) * 111.0);
