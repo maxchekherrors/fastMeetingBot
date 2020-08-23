@@ -43,9 +43,8 @@ inviteSchema.virtual('available').get(function () {
 	return this.ready && (Date.now() < this.endDate);
 });
 
-inviteSchema.methods.getFullDescription = async function () {
-	const user = await User.findOne({_id: this.userId});
-	return `Verified:${user.phoneNumber === '' ? '❌ ' : '✅'} \n${user.fullName}, ${user.age} - ${user.description}\n🎯 ${this.description}`;
+inviteSchema.methods.getUserInfo = async function () {
+	return User.findOne({_id: this.userId},"phoneNumber firstName age description sex photo");
 };
 inviteSchema.methods.findAround = function () {
 	const dist = process.env.SEARCH_RADIUS||5;

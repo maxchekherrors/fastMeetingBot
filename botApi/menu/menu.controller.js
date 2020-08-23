@@ -16,7 +16,7 @@ exports.mainMenu = {
 	},
 	editProfile: ctx => ctx.scene.enter('profileEdit'),
 	createInvite:ctx=>ctx
-        .setScenario(['inviteDescription','inviteLocation','inviteAvailable']),
+		.setScenario(['inviteDescription','inviteLocation','inviteAvailable']),
 
 	showProfile: async (ctx) => {
 		const {userId} = ctx;
@@ -24,9 +24,9 @@ exports.mainMenu = {
 		const {description,contact,age,sex} = conf.profile.edit.buttons;
 		const user = await User.findOne({_id: userId});
 		const info = `${
-            user.fullName 
+			user.fullName 
 		}<b>\n${sex}:</b> ${
-		    user.sex ==='m'?male:female
+			user.sex ==='m'?male:female
 		}\n<b>${age}: </b>${
 			user.age
 		}<b>\n${description}: </b>${
