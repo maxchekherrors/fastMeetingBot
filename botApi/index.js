@@ -1,7 +1,8 @@
 const fs = require('fs');
 const path = require('path');
 const Stage = require('telegraf/stage');
-
+const Invite = require('./invite/invite.model');
+const User = require('./user/user.model');
 const Scenes = [];
 fs.readdirSync(__dirname)
 	.filter((file) => file.indexOf('.') !== 0)
@@ -17,4 +18,5 @@ fs.readdirSync(__dirname)
 const stage = new Stage(Scenes, { default: 'mainMenu' });
 module.exports = function (bot) {
 	bot.use(stage.middleware());
+
 };

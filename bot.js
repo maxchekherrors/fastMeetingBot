@@ -7,7 +7,7 @@ const errorMiddleware = require('./middleware/error.middleware');
 const validationMiddleware = require('./middleware/validation.middleware');
 const spamMiddleware = require('./middleware/spam.middleware');
 const massageParseMiddleware = require('./middleware/messageParse.middleware');
-const queueMiddleware = require('./middleware/queue.middleware')('mainMenu');
+const queueMiddleware = require('./middleware/queue.middleware');
 
 const bot = new Telegraf(process.env.BOT_TOKEN);
 bot.use(Telegraf.log());
@@ -17,7 +17,6 @@ bot.use(massageParseMiddleware);
 bot.use(validationMiddleware);
 bot.use(queueMiddleware);
 bot.use(errorMiddleware);
-
 applyBotMiddleware(bot);
 
 bot.help(async (ctx) => {

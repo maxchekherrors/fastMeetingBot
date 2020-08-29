@@ -3,15 +3,15 @@ const Invite = require('./invite.model');
 const User = require('../user/user.model');
 const Extra = require('telegraf/extra');
 const getDistance = require('../../utils/getDistance');
-const conf = require('../../locals/ru').invite;
+const lcl = require('../../locals/ru').invite;
 exports.inviteLocation = {
     ask: (ctx) =>
-        ctx.replyWithHTML(`${conf.location.text.enter}`,
+        ctx.replyWithHTML(`${lcl.location.text.enter}`,
             Extra
                 .markup((m) => m
                     .keyboard([
-                        [m.locationRequestButton(`${conf.location.buttons.sendLocation}`)],
-                        [conf.location.buttons.undo]
+                        [m.locationRequestButton(`${lcl.location.buttons.sendLocation}`)],
+                        [lcl.location.buttons.undo]
                     ])
                     .resize()
                     .oneTime()
@@ -23,6 +23,7 @@ exports.inviteLocation = {
         await Invite.updateOne({_id: inviteId}, {
             $set: {location: {lat: latitude, lon: longitude}},
             ready: true,
+            endDate: Date.now() + 1000 * 60 * 30
         });
 
         return ctx.nextScene(true);//return ctx.scene.enter('inviteAvailable');
@@ -32,50 +33,82 @@ exports.inviteLocation = {
         await Invite.deleteOne({_id: inviteId});
         return ctx.dropScenario();
     },
-    error: ctx => ctx.replyWithHTML(`${conf.location.text.error}`)
+    error: ctx => ctx.replyWithHTML(`${lcl.location.text.error}`, Extra
+        .markup((m) => m
+            .keyboard([
+                [m.locationRequestButton(`${lcl.location.buttons.sendLocation}`)],
+                [lcl.location.buttons.undo]
+            ])
+            .resize()
+            .oneTime()
+        ))
 };
 exports.inviteDescription = {
     ask: async (ctx) => {
         const {userId} = ctx;
         const invite = await new Invite({userId}).save();
         await User.updateOne({_id: userId}, {lastInvite: invite._id});
-        return ctx.replyWithHTML(`${conf.description.text.enter}`, Extra.markup(m => m.removeKeyboard()));
+        return ctx.replyWithHTML(`${lcl.description.text.enter}`, Extra.markup(m => m
+            .resize()
+            .keyboard([`${lcl.description.buttons.undo}`])
+            .oneTime(false)
+        ));
     },
     get: async (ctx) => {
         const {inviteId} = ctx;
         let desc = ctx.getMessage(1, 200, 20);
         if (!desc)
-            return ctx.replyWithHTML(conf.description.text.toLarge);
+            return ctx.replyWithHTML(lcl.description.text.toLarge);
         await Invite.updateOne({_id: inviteId}, {
             $set: {description: desc},
         });
 
-        return ctx.sceneComplete(`${conf.description.text.preSuccess}`, `${conf.description.buttons.submit}`);
+        return ctx.sceneComplete(`${lcl.description.text.success}`, `${lcl.description.buttons.submit}`);
     },
-    getPhoto: async (ctx) => {
+    undo: async ctx => {
+        const {inviteId} = ctx;
+        await Invite.deleteOne({_id: inviteId});
+        return ctx.dropScenario();
+    },
+    error: ctx => ctx.replyWithHTML(`${lcl.description.text.error}`)
+};
+exports.invitePhoto = {
+    ask: ctx => ctx.sceneComplete(`${lcl.photo.text.enter}`, `${lcl.photo.buttons.submit}`),
+    get: async (ctx) => {
         const {inviteId} = ctx;
         const photo = ctx.message.photo[0].file_id;
         await Invite.updateOne({_id: inviteId}, {photo});
-        return ctx.replyWithHTML(`${conf.description.text.success}`);
+        return ctx.replyWithHTML(`${lcl.description.text.success}`);
     },
-    error: ctx => ctx.replyWithHTML(`${conf.description.text.error}`)
+    error: ctx => ctx.sceneComplete(`${lcl.photo.text.error}`, `${lcl.photo.buttons.submit}`)
 };
 exports.inviteAvailable = {
     find: async (ctx) => {
         const {userId, inviteId} = ctx;
-        await ctx.replyWithHTML(`${conf.available.text.enter}`,
-            Extra
-                .HTML()
-                .markup((markup) => markup.resize()
-                    .keyboard([
-                        [`${conf.available.buttons.drop}`],
-                    ]).oneTime()));
+        const {noResults, enter} = lcl.available.text;
         const invite = await Invite.findOne({_id: inviteId});
         const friends = await invite.findAround();
-        if (friends.length === 0) {
-            return ctx.replyWithHTML(`${conf.available.text.noResults}`);
+        const kb = [`${lcl.available.buttons.drop}`];
+        if (friends.length) {
+            await ctx.replyWithHTML(`${enter}`,
+                Extra
+                    .markup((m) => m
+                        .resize()
+                        .keyboard(kb)
+                        .oneTime()
+                    )
+            );
+        } else {
+            await ctx.replyWithAudio(`${lcl.available.files.noResultsAudio}`, Extra
+                .HTML()
+                .load({caption: `${enter}\n${noResults}`})
+                .markup((m) => m
+                    .resize()
+                    .keyboard(kb)
+                    .oneTime()
+                )
+            );
         }
-        console.log(friends.length);
         friends.forEach(async (friend) => {
             const distance = getDistance(invite.location, friend.location);
             await shareInvite(ctx.telegram, userId, friend, distance);
@@ -103,7 +136,11 @@ exports.inviteAvailable = {
         });
         return ctx.dropScenario();
     },
-    error: ctx => ctx.replyWithHTML(`${conf.available.text.error}`)
+    error: ctx => ctx.replyWithHTML(`${lcl.available.text.error}`,Extra.markup((m) => m
+        .resize()
+        .keyboard([`${lcl.available.buttons.drop}`])
+        .oneTime()
+    ))
 };
 
 exports.next = (ctx) => ctx.nextScene();
@@ -111,16 +148,28 @@ exports.next = (ctx) => ctx.nextScene();
 async function shareInfo(telegram, userId, profileId) {
     const user = await User.findOne({_id: profileId});
     if (user) {
-        const{_id,firstName,userName,age,description,photo} = user;
+        const {_id, firstName, userName, age, sex, description, photo, phoneNumber} = user;
         return telegram.sendPhoto(userId, photo,
             Extra
                 .HTML()
                 .load({
-                    caption: `<a href = "tg://user?id=${_id}">${firstName}</a>, ${age} - ${description}\nAgreed in your invite!`
+                    caption: `${
+                        sex === 'm' ? '🤵' : '👩‍💼'
+                        }${
+                        phoneNumber ? '✅' : '❌'
+                        }\n<a href = "tg://user?id=${
+                        _id
+                        }">${
+                        firstName
+                        }</a>, ${
+                        age
+                        } - ${
+                        description
+                        }\n<b>Согласен на ваше приглашение!</b>>`
                 })
-                .markup(m => userName?m.inlineKeyboard(
-                    [m.urlButton(`${conf.available.buttons.getUser}`, `http://t.me/${userName}`)]
-                    ):m
+                .markup(m => userName ? m.inlineKeyboard(
+                    [m.urlButton(`${lcl.available.buttons.getUser}`, `http://t.me/${userName}`)]
+                    ) : m
                 )
         );
     }
@@ -128,12 +177,13 @@ async function shareInfo(telegram, userId, profileId) {
 
 async function shareInvite(telegram, userId, invite, dist) {
     const {phoneNumber, firstName, age, description, sex, photo} = await invite.getUserInfo();
+
     let invitePhoto = invite.photo || photo;
     return telegram.sendPhoto(userId, invitePhoto,
         Extra
             .HTML()
             .load({
-                caption: `📍${dist}\n ${sex} ${firstName} ${phoneNumber?'✅':'❌'}, ${age} - ${description}\n🎯 ${invite.description}`
+                caption: `📍${dist}\n${sex === 'm' ? '🤵' : '👩‍💼'}${phoneNumber ? '✅' : '❌'}\n${firstName} , ${age} - ${description}\n🎯 ${invite.description}`
             })
             .markup((m) => m.inlineKeyboard([
                 m.callbackButton('❌', 'ignore'),

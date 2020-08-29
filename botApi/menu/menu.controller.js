@@ -1,4 +1,4 @@
-const conf = require('../../locals/ru');
+const lcl = require('../../locals/ru');
 const Extra = require('telegraf/extra');
 const User = require('../user/user.model');
 
@@ -15,13 +15,18 @@ exports.mainMenu = {
 		console.log(ctx.session);
 	},
 	editProfile: ctx => ctx.scene.enter('profileEdit'),
-	createInvite:ctx=>ctx
-		.setScenario(['inviteDescription','inviteLocation','inviteAvailable']),
+	createInvite: async ctx=>{
+		const {userId} = ctx;
+		const user = await User.findOne({_id:userId});
+		if(!user||!user.isComplete())
+			return ctx.replyWithHTML(`${lcl.menu.text.userError}`);
+		return ctx.setScenario(['inviteDescription','invitePhoto','inviteLocation','inviteAvailable']);
+	},
 
 	showProfile: async (ctx) => {
 		const {userId} = ctx;
-		const {male, female} = conf.profile.sex.buttons;
-		const {description,contact,age,sex} = conf.profile.edit.buttons;
+		const {male, female} = lcl.profile.sex.buttons;
+		const {description,contact,age,sex} = lcl.profile.edit.buttons;
 		const user = await User.findOne({_id: userId});
 		const info = `${
 			user.fullName 
@@ -38,12 +43,12 @@ exports.mainMenu = {
 	},
 
 	send: async (ctx) => {
-		const buttons = conf.menu.buttons;
+		const buttons = lcl.menu.buttons;
 		const kb = [
 			[buttons.createInvite],
 			[buttons.showProfile, buttons.editProfile],
 		];
-		return ctx.sceneComplete(`${conf.menu.text.enter}`,kb);
+		return ctx.sceneComplete(`${lcl.menu.text.enter}`,kb);
 	}
 };
 

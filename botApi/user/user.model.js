@@ -1,5 +1,5 @@
-const mongoose = require('mongoose');
 
+const mongoose = require('mongoose');
 const userSchema = new mongoose.Schema({
 	_id: Number,
 	phoneNumber: {
@@ -29,7 +29,7 @@ const userSchema = new mongoose.Schema({
 	},
 	photo: {
 		type: String,
-		default: '',
+		default: 'AgACAgIAAxkBAAIj7l9G7rUOv0CkRfPmCPWSDqEXfnaCAAJJrzEbKmQ5Su2y9Z9G0VV6V4nmkS4AAwEAAwIAA20AA78zBgABGwQ',
 	},
 	lastInvite: mongoose.Schema.ObjectId,
 	updatedAt: {
@@ -44,6 +44,9 @@ const userSchema = new mongoose.Schema({
 userSchema.virtual('fullName').get(function () {
 	return `${this.firstName} ${this.lastName}`;
 });
+userSchema.methods.isComplete = function(){
+	return this.photo&&this.age&&this.sex&&this.description;
+};
 userSchema.pre('save', function (next) {
 	this.updatedAt = Date.now();
 	return next();

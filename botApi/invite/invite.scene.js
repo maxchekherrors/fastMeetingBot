@@ -7,7 +7,7 @@ exports.inviteLocation = () => {
 	const {inviteLocation} = controllers;
 	const location = new Scene('inviteLocation');
 	location.enter(inviteLocation.ask);
-	location.hears(conf.location.buttons.undo,inviteLocation.undo);
+	location.hears(`${conf.location.buttons.undo}`,inviteLocation.undo);
 	location.on('location', inviteLocation.get);
 	location.on('message',inviteLocation.error);
 	return location;
@@ -18,10 +18,20 @@ exports.inviteDescription = () => {
 	const description = new Scene('inviteDescription');
 	description.enter(inviteDescription.ask);
 	description.hears(`${conf.description.buttons.submit}`, next);
+	description.hears(`${conf.description.buttons.undo}`, inviteDescription.undo);
 	description.on('text', inviteDescription.get);
-	description.on('photo', inviteDescription.getPhoto);
 	description.on('message', inviteDescription.error);
 	return description;
+};
+exports.invitePhoto = ()=>{
+	const {invitePhoto} = controllers;
+	const photo = new Scene('invitePhoto');
+	photo.enter(invitePhoto.ask);
+	photo.hears(`${conf.photo.buttons.submit}`, next);
+	photo.on('photo', invitePhoto.get);
+	photo.on('message', invitePhoto.error);
+	return photo;
+
 };
 
 exports.inviteAvailable = () => {
