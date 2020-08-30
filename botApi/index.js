@@ -1,8 +1,6 @@
 const fs = require('fs');
 const path = require('path');
 const Stage = require('telegraf/stage');
-const Invite = require('./invite/invite.model');
-const User = require('./user/user.model');
 const Scenes = [];
 fs.readdirSync(__dirname)
 	.filter((file) => file.indexOf('.') !== 0)

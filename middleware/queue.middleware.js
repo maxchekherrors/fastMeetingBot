@@ -7,8 +7,8 @@ module.exports =  (ctx, next) => {
 	ctx.setScenario = queue => {
 
 
-        ctx.session.__scenario.queue = queue;
-        console.log(ctx.session.__scenario);
+		ctx.session.__scenario.queue = queue;
+		console.log(ctx.session.__scenario);
 		return ctx.nextScene(true);
 	};
 	ctx.dropScenario = () => {

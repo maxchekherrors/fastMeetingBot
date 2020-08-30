@@ -3,8 +3,6 @@ const Koa = require('koa');
 const koaBody = require('koa-body');
 const mongoose = require('mongoose');
 const bot = require('./bot');
-
-
 const app = new Koa();
 app.use(koaBody());
 app.use(async (ctx, next) => {

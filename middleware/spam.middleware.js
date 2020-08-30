@@ -13,9 +13,9 @@ module.exports = ({session,replyWithAudio}, next)=>{
 	let dif;
 	if(( dif = ++__touch.count-maxTouches ) > 0){
 		__touch.last = Date.now();
-			return dif>1?void 0:replyWithAudio(`${conf.files.banAudio}`,Extra
-				.HTML()
-				.load({caption:`${conf.text.ban}`}))
+		return dif>1?void 0:replyWithAudio(`${conf.files.banAudio}`,Extra
+			.HTML()
+			.load({caption:`${conf.text.ban}`}));
 	}
 	return next();
 };
