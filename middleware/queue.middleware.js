@@ -1,3 +1,4 @@
+'use strict';
 const Extra = require('telegraf/extra');
 const def = process.env.DEFAULT_SCENE||'mainMenu';
 module.exports =  (ctx, next) => {

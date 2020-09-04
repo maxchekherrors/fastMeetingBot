@@ -1,12 +1,16 @@
+'use strict';
 require('dotenv').config();
+const config = require('./config');
 const Koa = require('koa');
 const koaBody = require('koa-body');
 const mongoose = require('mongoose');
 const bot = require('./bot');
+
 const app = new Koa();
+
 app.use(koaBody());
 app.use(async (ctx, next) => {
-	if (ctx.method !== 'POST' || ctx.url !== '/bot') {
+	if (ctx.method !== 'POST' || ctx.url !== `/${config.bot.password}`) {
 		return next();
 	}
 	await bot.handleUpdate(ctx.request.body, ctx.response);
@@ -15,11 +19,10 @@ app.use(async (ctx, next) => {
 app.use(async (ctx) => {
 	ctx.body = 'Hello from fast meeting bot!';
 });
-
 async function bootstrap() {
-	await mongoose.connect(`${process.env.DATABASE_CONNECTION}`, {useNewUrlParser: true});
-	await bot.telegram.setWebhook(`${process.env.WEB_HOOK}`);
-	return app.listen(`${process.env.PORT}`);
+	await mongoose.connect(`${config.database.connectionString}`, {useNewUrlParser: true});
+	await bot.telegram.setWebhook(`${config.bot.webHook}`);
+	return app.listen(`${config.server.port}`);
 }
 
 bootstrap()

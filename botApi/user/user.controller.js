@@ -1,3 +1,4 @@
+'use strict';
 const Extra = require('telegraf/extra');
 const User = require('./user.model');
 const lcl = require('../../locals/ru').profile;

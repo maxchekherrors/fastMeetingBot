@@ -1,4 +1,5 @@
 //const Markup = require('telegraf/markup');
+'use strict';
 const Invite = require('./invite.model');
 const User = require('../user/user.model');
 const Extra = require('telegraf/extra');

@@ -1,4 +1,4 @@
-
+'use strict';
 module.exports = (ctx,next) => {
 	if(!ctx.message)return next();
 	const {text} = ctx.message;

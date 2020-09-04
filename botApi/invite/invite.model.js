@@ -1,6 +1,7 @@
+'use strict';
 const mongoose = require('mongoose');
 const User = require('../user/user.model');
-
+const {searchRadius} = require('../../config').bot;
 const inviteSchema = new mongoose.Schema({
 	userId: {
 		type: Number,
@@ -46,13 +47,13 @@ inviteSchema.virtual('available').get(function () {
 inviteSchema.methods.getUserInfo = async function () {
 	return User.findOne({_id: this.userId},'phoneNumber firstName age description sex photo');
 };
-const dist = process.env.SEARCH_RADIUS||5;
+
 inviteSchema.methods.findAround = function () {
 
-	const minLat = this.location.lat - (dist / 111.0);
-	const maxLat = this.location.lat + (dist / 111.0);
-	const minLong = this.location.lon - dist / Math.abs(Math.cos(Math.PI / 180 * this.location.lat) * 111.0);
-	const maxLong = this.location.lon + dist / Math.abs(Math.cos(Math.PI / 180 * this.location.lat) * 111.0);
+	const minLat = this.location.lat - (searchRadius / 111.0);
+	const maxLat = this.location.lat + (searchRadius / 111.0);
+	const minLong = this.location.lon - searchRadius / Math.abs(Math.cos(Math.PI / 180 * this.location.lat) * 111.0);
+	const maxLong = this.location.lon + searchRadius / Math.abs(Math.cos(Math.PI / 180 * this.location.lat) * 111.0);
 	console.log(minLat,maxLat,minLong,maxLong);
 	return mongoose.model('invite').find({
 		$and: [

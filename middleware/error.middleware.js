@@ -1,3 +1,4 @@
+'use strict';
 const conf = require('../locals/ru').middleware.serverError;
 module.exports = async (ctx, next) => {
 	try {
