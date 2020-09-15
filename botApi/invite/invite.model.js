@@ -48,24 +48,25 @@ inviteSchema.methods.getUserInfo = async function () {
 	return User.findOne({_id: this.userId},'phoneNumber firstName age description sex photo');
 };
 
-inviteSchema.methods.findAround = function () {
-
+inviteSchema.methods.findAround = function (limit = 10) {
 	const minLat = this.location.lat - (searchRadius / 111.0);
 	const maxLat = this.location.lat + (searchRadius / 111.0);
 	const minLong = this.location.lon - searchRadius / Math.abs(Math.cos(Math.PI / 180 * this.location.lat) * 111.0);
 	const maxLong = this.location.lon + searchRadius / Math.abs(Math.cos(Math.PI / 180 * this.location.lat) * 111.0);
-	console.log(minLat,maxLat,minLong,maxLong);
-	return mongoose.model('invite').find({
-		$and: [
-			{_id: {$ne: this._id}},
-			{ready: true},
-			{endDate: {$gte: Date.now()}},
-			{'location.lat': {$gte: minLat}},
-			{'location.lat': {$lte: maxLat}},
-			{'location.lon': {$gte: minLong}},
-			{'location.lon': {$lte: maxLong}},
-		],
-	});
+	return mongoose
+		.model('invite').find({
+			$and: [
+				{_id: {$ne: this._id}},
+				{ready: true},
+				{endDate: {$gte: Date.now()}},
+				{'location.lat': {$gte: minLat}},
+				{'location.lat': {$lte: maxLat}},
+				{'location.lon': {$gte: minLong}},
+				{'location.lon': {$lte: maxLong}},
+			],
+		})
+		.sort({startDate:-1})
+		.limit(limit);
 };
 const Invite = mongoose.model('invite', inviteSchema);
 module.exports = Invite;

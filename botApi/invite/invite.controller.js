@@ -1,10 +1,10 @@
-//const Markup = require('telegraf/markup');
 'use strict';
 const Invite = require('./invite.model');
 const User = require('../user/user.model');
 const Extra = require('telegraf/extra');
 const getDistance = require('../../utils/getDistance');
-const lcl = require('../../locals/ru').invite;
+const {invite:lcl} = require('../../locals/ru');
+const{bot:config} = require('../../config');
 exports.inviteLocation = {
 	ask: (ctx) =>
 		ctx.replyWithHTML(`${lcl.location.text.enter}`,
@@ -88,7 +88,7 @@ exports.inviteAvailable = {
 		const {userId, inviteId} = ctx;
 		const {noResults, enter} = lcl.available.text;
 		const invite = await Invite.findOne({_id: inviteId});
-		const friends = await invite.findAround();
+		const friends = await invite.findAround(config.inviteLimit);
 		const kb = [`${lcl.available.buttons.drop}`];
 		if (friends.length) {
 			await ctx.replyWithHTML(`${enter}`,
@@ -138,8 +138,8 @@ exports.inviteAvailable = {
 			]
 		});
 		if (userInvite) {
-			await shareInfo(ctx.telegram, userId, agreedInvite.userId);
-			await shareInfo(ctx.telegram, agreedInvite.userId, userId);
+			await shareInfo(ctx, userId, agreedInvite.userId);
+			await shareInfo(ctx, agreedInvite.userId, userId);
 		}
 		return ctx.deleteMessage();
 	},
@@ -159,7 +159,7 @@ exports.inviteAvailable = {
 
 exports.next = (ctx) => ctx.nextScene();
 
-async function shareInfo(telegram, userId, profileId) {
+async function shareInfo({telegram}, userId, profileId) {
 	const user = await User.findOne({_id: profileId});
 	if (user) {
 		const {_id, firstName, userName, age, sex, description, photo, phoneNumber} = user;

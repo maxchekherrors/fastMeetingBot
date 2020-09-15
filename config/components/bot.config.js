@@ -8,6 +8,8 @@ const envSchema = joi
 		SEARCH_RADIUS: joi.number().integer().min(1).max(50),
 		MAX_TOUCHES: joi.number().integer().min(5).max(60),
 		TOUCH_INTERVAL: joi.number().integer().min(5).max(60),
+		INVITE_INTERVAL:joi.number().integer().min(0).max(30),
+		INVITE_LIMIT:joi.number().integer().min(1).max(30)
 	})
 	.unknown()
 	.required();
@@ -23,7 +25,9 @@ const config = {
 		webHook: `${envVars.WEB_HOOK}/${envVars.BOT_PASSWORD}`,
 		searchRadius: envVars.SEARCH_RADIUS||2,
 		maxTouches:envVars.MAX_TOUCHES||10,
-		touchInterval:envVars.TOUCH_INTERVAL||10
+		touchInterval:(envVars.TOUCH_INTERVAL||10)*1000,
+		inviteInterval:(envVars.INVITE_INTERVAL||10)*60*1000,
+		inviteLimit:envVars.INVITE_LIMIT||10
 	}
 };
 

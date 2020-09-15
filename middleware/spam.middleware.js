@@ -6,7 +6,7 @@ module.exports = ({session,replyWithAudio}, next)=>{
 	if(!session.__touch)
 		session.__touch = {last:Date.now(),count:0};
 	const {__touch} = session;
-	if(Date.now() - __touch.last>touchInterval*1000){
+	if(Date.now() - __touch.last>touchInterval){
 		__touch.last = Date.now();
 		__touch.count = 0;
 	}

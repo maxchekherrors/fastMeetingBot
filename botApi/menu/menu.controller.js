@@ -1,7 +1,9 @@
+'use strict';
 const lcl = require('../../locals/ru');
+const {bot:config} = require('../../config');
 const Extra = require('telegraf/extra');
 const User = require('../user/user.model');
-
+const Invite = require('../invite/invite.model');
 exports.mainMenu = {
 	start: ctx => {
 		ctx.setScenario([
@@ -16,10 +18,13 @@ exports.mainMenu = {
 	},
 	editProfile: ctx => ctx.scene.enter('profileEdit'),
 	createInvite: async ctx=>{
-		const {userId} = ctx;
+		const {userId,inviteId} = ctx;
 		const user = await User.findOne({_id:userId});
 		if(!user||!user.isComplete())
 			return ctx.replyWithHTML(`${lcl.menu.text.userError}`);
+		const invite = await Invite.findOne({_id:inviteId});
+		if(invite&&Date.now()-invite.startDate<config.inviteInterval)
+			return ctx.replyWithHTML(`${lcl.menu.text.inviteError}`);
 		return ctx.setScenario(['inviteDescription','invitePhoto','inviteLocation','inviteAvailable']);
 	},
 

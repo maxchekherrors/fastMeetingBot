@@ -1,7 +1,7 @@
 'use strict';
 const Extra = require('telegraf/extra');
 const User = require('./user.model');
-const lcl = require('../../locals/ru').profile;
+const {profile:lcl} = require('../../locals/ru');
 
 exports.profileSex = {
 	ask: ctx => ctx.replyWithHTML(`${lcl.sex.text.enter}`, Extra.markup(m => m
