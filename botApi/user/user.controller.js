@@ -53,25 +53,25 @@ exports.profilePhoto = {
 	ask: ctx => ctx
 		.replyWithHTML(`${lcl.photo.text.enter}`,
 			Extra.markup(m => m
-                .resize()
-                .keyboard(
-                    [`${lcl.photo.buttons.getProfilePhoto}`]
-                )
+				.resize()
+				.keyboard(
+					[`${lcl.photo.buttons.getProfilePhoto}`]
+				)
 
-            )
+			)
 		)
 	,
-    download:async ctx=>{
-        const {userId} = ctx;
-        const {photos} = await ctx.telegram.getUserProfilePhotos(userId,0,1);
-        if(!photos) return ctx.replyWithHTML(`${lcl.photo.text.downloadError}`,Extra.markup(m=>m.removeKeyboard()));
-        console.log(photos[0]);
-        const {file_id:photo} = photos[0][0];
-        await User.updateOne({_id: userId}, {
-            $set: {photo},
-        });
-        return ctx.nextScene(true);
-    },
+	download:async ctx=>{
+		const {userId} = ctx;
+		const {photos} = await ctx.telegram.getUserProfilePhotos(userId,0,1);
+		if(!photos||!photos.length) return ctx.replyWithHTML(`${lcl.photo.text.downloadError}`,Extra.markup(m=>m.removeKeyboard()));
+		console.log(photos[0]);
+		const {file_id:photo} = photos[0][0];
+		await User.updateOne({_id: userId}, {
+			$set: {photo},
+		});
+		return ctx.nextScene(true);
+	},
 	get: async (ctx) => {
 
 		const {userId} = ctx;
