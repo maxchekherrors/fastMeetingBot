@@ -14,7 +14,7 @@ exports.mainMenu = {
 			'profilePhoto',
 			'profileContact'
 		]);
-		console.log(ctx.session);
+
 	},
 	editProfile: ctx => ctx.scene.enter('profileEdit'),
 	createInvite: async ctx=>{

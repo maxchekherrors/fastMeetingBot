@@ -9,7 +9,7 @@ module.exports =  (ctx, next) => {
 
 
 		ctx.session.__scenario.queue = queue;
-		console.log(ctx.session.__scenario);
+
 		return ctx.nextScene(true);
 	};
 	ctx.dropScenario = () => {

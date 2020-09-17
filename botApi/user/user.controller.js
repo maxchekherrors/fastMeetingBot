@@ -65,7 +65,7 @@ exports.profilePhoto = {
 		const {userId} = ctx;
 		const {photos} = await ctx.telegram.getUserProfilePhotos(userId,0,1);
 		if(!photos||!photos.length) return ctx.replyWithHTML(`${lcl.photo.text.downloadError}`,Extra.markup(m=>m.removeKeyboard()));
-		console.log(photos[0]);
+
 		const {file_id:photo} = photos[0][0];
 		await User.updateOne({_id: userId}, {
 			$set: {photo},
