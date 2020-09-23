@@ -20,6 +20,7 @@ router.get('/uploads/:id',async ctx=>{
 	const fileLink = await bot.telegram.getFileLink(ctx.params.id);
 	if(!fileLink) return ctx.status = 404;
 	return  fetch(`${fileLink}`).then(res=>{
+		ctx.type = 'image/png';
 		ctx.body  = res.body;
 	});
 });
