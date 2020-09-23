@@ -12,6 +12,7 @@ const userSchema = new mongoose.Schema({
 		enum: ['m', 'f']
 	},
 	age: Number,
+	faces:Number,
 	userName: {
 		type: String,
 		default: '',

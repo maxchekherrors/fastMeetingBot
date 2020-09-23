@@ -1,6 +1,5 @@
 'use strict';
 const Scene = require('telegraf/scenes/base');
-//const simpleAnswer = require('../../utils/createMsgAnsw');
 const conf = require('../../locals/ru').invite;
 const controllers = require('./invite.controller');
 const {next} = controllers;
