@@ -43,7 +43,7 @@ exports.mainMenu = {
 			user.description
 		}<b>\n${contact}: </b>${
 			user.phoneNumber ? '✅' : '❌'
-		}\n<i>${user.faces?'':'‼️Я не вижу твоего лица. . .'}</i>`;
+		}\n<i>${user.faces===0?'🤖🗯Я не вижу твоего лица. . .':''}</i>`;
 		return ctx.replyWithPhoto(user.photo, Extra.caption(info).HTML());
 	},
 
