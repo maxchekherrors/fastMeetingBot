@@ -24,6 +24,7 @@ exports.inviteLocation = {
 		await Invite.updateOne({_id: inviteId}, {
 			$set: {location: {lat: latitude, lon: longitude}},
 			ready: true,
+			startDate: Date.now(),
 			endDate: Date.now() + 1000 * 60 * 30
 		});
 
