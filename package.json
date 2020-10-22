@@ -17,16 +17,18 @@
     "koa-router": "^9.4.0",
     "mongoose": "^5.9.26",
     "node-fetch": "^2.6.1",
-    "telegraf": "^3.38.0"
+    "telegraf": "^3.38.0",
+    "telegraf-test": "^1.2.1"
   },
   "devDependencies": {
     "eslint": "^7.6.0",
     "eslint-config-airbnb-base": "^14.2.0",
     "eslint-config-google": "^0.14.0",
-    "eslint-plugin-import": "^2.22.0"
+    "eslint-plugin-import": "^2.22.0",
+    "jest": "^26.4.2"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest",
     "lint": "eslint .",
     "start": "node index.js"
   },
