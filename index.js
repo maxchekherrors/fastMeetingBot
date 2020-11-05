@@ -7,12 +7,14 @@ const app = require('./server');
 
 async function bootstrap() {
 	await mongoose.connect(`${config.database.connectionString}`, {useNewUrlParser: true});
-	if(config.env === 'production') {
-		await bot.telegram.setWebhook(`${config.bot.webHook}`);
+	if(config.isDevelopment||config.isTest) {
+		await bot.launch();
+
 	}
 	else{
-		await bot.launch();
+		await bot.telegram.setWebhook(`${config.bot.webHook}`);
 	}
+
 	return app.listen(`${config.server.port}`);
 }
 

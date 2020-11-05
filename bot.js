@@ -10,7 +10,7 @@ const massageParseMiddleware = require('./middleware/messageParse.middleware');
 const queueMiddleware = require('./middleware/queue.middleware');
 
 const bot = new Telegraf(config.bot.token);
-if (config.isDevelopment || config.isTest)
+if (config.isDevelopment)
 	bot.use(Telegraf.log());
 bot.use(session());
 bot.use(spamMiddleware);
