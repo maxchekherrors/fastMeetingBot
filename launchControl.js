@@ -6,19 +6,21 @@ const app = require('./server');
 
 
 async function bootstrap() {
-    await mongoose.connect(`${config.database.connectionString}`, {useNewUrlParser: true});
-    if(config.isDevelopment||config.isTest) {
-        await bot.launch();
+	await mongoose.connect(`${config.database.connectionString}`, {useNewUrlParser: true});
+	if(config.isDevelopment||config.isTest) {
+		await bot.launch();
 
-    }
-    else{
-        await bot.telegram.setWebhook(`${config.bot.webHook}`);
-    }
+	}
+	else{
+		await bot.telegram.setWebhook(`${config.bot.webHook}`);
+	}
 
-    return app.listen(`${config.server.port}`);
+	return app.listen(`${config.server.port}`);
 }
 async function shutdown() {
-    app.close();
-    mongoose.
+	await mongoose.connection.close();
+	await bot.stop();
+	return app.close();
+
 }
-module.exports = bootstrap;
+module.exports = {shutdown,bootstrap};
