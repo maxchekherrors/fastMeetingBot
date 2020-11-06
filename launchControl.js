@@ -18,7 +18,8 @@ async function bootstrap() {
     return app.listen(`${config.server.port}`);
 }
 async function shutdown() {
-    app.close();
-    mongoose.
+    await bot.stop();
+    mongoose.connection.close();
+    return app.close();
 }
-module.exports = bootstrap;
+module.exports = {bootstrap,shutdown};
