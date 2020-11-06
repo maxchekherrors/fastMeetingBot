@@ -2,7 +2,6 @@
 const config = require('../config');
 const lcl = require('../locals/ru');
 const TelegrafTest = require('telegraf-test');
-//const {bootstrap,/*shutdown*/} = require('../launchControl');
 const user = new TelegrafTest({
 	url: `${config.bot.webHook}`
 });
@@ -10,8 +9,9 @@ user.setUser({
 	id: 522658339,
 	username: '@test'
 });
-//beforeAll( () =>  bootstrap().then(()=>console.log('Ok')));
-//afterAll( () =>shutdown());
+beforeAll(async () => {
+	await require('../index');
+});
 describe('Bot menu',()=>{
 	const{text,buttons} = lcl.menu;
 	test('Incorrect input',async()=>{
